@@ -5,7 +5,7 @@ import {
   SidebarHeader
 } from "@/components/ui/sidebar";
 import { getUser } from "@/server/services/auth/get-user";
-import { DashboardButton } from "./buttons/dashboard-button";
+import { DashboardLink } from "./links/dashboard-link";
 import { DailyActionsSection } from "./sections/daily-actions-section";
 import { SettingsSection } from "./sections/setting-section";
 import { SidebarProfile } from "./sidebar-profile";
@@ -16,7 +16,7 @@ export async function AppSidebar({ }) {
   return (
     <Sidebar>
       <SidebarHeader>
-        <DashboardButton />
+        <DashboardLink />
       </SidebarHeader>
       <SidebarContent>
         <DailyActionsSection />

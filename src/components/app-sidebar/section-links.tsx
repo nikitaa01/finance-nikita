@@ -5,7 +5,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu
 } from "@/components/ui/sidebar";
-import { SectionButton } from "./buttons/section-button";
+import { SectionLink } from "./links/section-link";
 
 export function SectionLinks({
   links,
@@ -23,7 +23,7 @@ export function SectionLinks({
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarMenu>
         {links.map((item) => (
-          <SectionButton key={item.name} item={item} />
+          <SectionLink key={item.name} item={item} />
         ))}
       </SidebarMenu>
     </SidebarGroup>

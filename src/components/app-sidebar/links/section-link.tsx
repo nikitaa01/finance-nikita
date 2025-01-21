@@ -5,7 +5,7 @@ import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export const SectionButton = ({ item }: {
+export const SectionLink = ({ item }: {
   item: {
     name: string;
     url: string;
