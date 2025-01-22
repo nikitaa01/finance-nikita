@@ -15,7 +15,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { logOut } from "@/server/services/auth/log-out";
-import { User } from "better-auth";
+import type { User } from "better-auth";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 
 export const SidebarProfile = ({ user }: { user: User }) => {
@@ -30,7 +30,7 @@ export const SidebarProfile = ({ user }: { user: User }) => {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className="size-8 rounded-lg">
                 <AvatarImage src={user.image ?? undefined} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
                   Avatar for {user.name}
@@ -51,7 +51,7 @@ export const SidebarProfile = ({ user }: { user: User }) => {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="size-8 rounded-lg">
                   <AvatarImage src={user.image ?? undefined} alt={user.name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>

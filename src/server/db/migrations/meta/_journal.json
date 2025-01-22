@@ -15,6 +15,13 @@
       "when": 1737310948443,
       "tag": "0001_lowly_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1737484856315,
+      "tag": "0002_futuristic_silk_fever",
+      "breakpoints": true
     }
   ]
 }

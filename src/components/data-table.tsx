@@ -1,7 +1,8 @@
 "use client";
 
+import type {
+  ColumnDef} from "@tanstack/react-table";
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -32,7 +33,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded-md border w-full">
+    <div className="w-full rounded-md border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

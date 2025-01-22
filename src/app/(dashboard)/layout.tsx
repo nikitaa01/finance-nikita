@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full min-h-screen px-8 py-4">
+      <main vaul-drawer-wrapper="true" className="min-h-dvh w-full px-8 py-4">
         <div className="pb-4">
           <SidebarTrigger />
         </div>

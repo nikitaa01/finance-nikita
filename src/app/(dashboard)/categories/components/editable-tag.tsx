@@ -4,7 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CategoryTag } from "@/server/db/schema/category-tag";
+import type { CategoryTag } from "@/server/db/schema/category-tag";
 
 export const EditableTag = ({ color, id, name }: CategoryTag) => {
   return (
