@@ -15,7 +15,7 @@ const eslintConfig = [
       "next/core-web-vitals",
       "next/typescript",
       "plugin:tailwindcss/recommended",
-      "plugin:prettier/recommended"
+      "plugin:prettier/recommended",
     ],
     plugins: ["eslint-plugin-react-compiler"],
     rules: {
@@ -25,7 +25,6 @@ const eslintConfig = [
       "tailwindcss/no-contradicting-classname": "error",
       "react-compiler/react-compiler": "error",
       "prettier/prettier": "error",
-
     },
   }),
 ];
