@@ -1,7 +1,6 @@
 "use client";
 
-import type {
-  ColumnDef} from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
@@ -26,6 +25,9 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  // eslint-disable-next-line react-compiler/react-compiler
+  "use no memo";
+
   const table = useReactTable({
     data,
     columns,
@@ -45,7 +47,7 @@ export function DataTable<TData, TValue>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 );

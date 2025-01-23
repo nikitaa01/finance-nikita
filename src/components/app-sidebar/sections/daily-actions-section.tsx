@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Home, Settings } from "lucide-react";
 import { SectionLinks } from "../section-links";

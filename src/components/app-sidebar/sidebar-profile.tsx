@@ -15,10 +15,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { logOut } from "@/server/services/auth/log-out";
-import type { User } from "better-auth";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 
-export const SidebarProfile = ({ user }: { user: User }) => {
+export const SidebarProfile = ({
+  image,
+  name,
+  email,
+}: {
+  image?: string;
+  name: string;
+  email: string;
+}) => {
   const { isMobile } = useSidebar();
 
   return (
@@ -31,14 +38,14 @@ export const SidebarProfile = ({ user }: { user: User }) => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="size-8 rounded-lg">
-                <AvatarImage src={user.image ?? undefined} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  Avatar for {user.name}
+                {image && <AvatarImage src={image} alt={name} />}
+                <AvatarFallback className="sr-only rounded-lg">
+                  Avatar for {name}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{name}</span>
+                <span className="truncate text-xs">{email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -52,12 +59,12 @@ export const SidebarProfile = ({ user }: { user: User }) => {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="size-8 rounded-lg">
-                  <AvatarImage src={user.image ?? undefined} alt={user.name} />
+                  <AvatarImage src={image ?? undefined} alt={name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">{name}</span>
+                  <span className="truncate text-xs">{email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

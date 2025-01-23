@@ -1,1 +1,0 @@
-ALTER TABLE `category` ADD `color` text NOT NULL;

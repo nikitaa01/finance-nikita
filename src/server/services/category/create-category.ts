@@ -7,5 +7,4 @@ export const createCategory = async (categoryData: InsertCategory) => {
   const newCategory = await db.insert(category).values(categoryData).run();
 
   return newCategory;
-
-}
+};

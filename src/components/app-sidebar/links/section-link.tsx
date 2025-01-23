@@ -1,16 +1,18 @@
-"use client"
+"use client";
 
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export const SectionLink = ({ item }: {
+export const SectionLink = ({
+  item,
+}: {
   item: {
     name: string;
     url: string;
     icon: LucideIcon;
-  }
+  };
 }) => {
   const pathname = usePathname() ?? "/";
 
@@ -23,5 +25,5 @@ export const SectionLink = ({ item }: {
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
-  )
-}
+  );
+};

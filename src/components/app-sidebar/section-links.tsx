@@ -3,7 +3,7 @@ import { type LucideIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarMenu
+  SidebarMenu,
 } from "@/components/ui/sidebar";
 import { SectionLink } from "./links/section-link";
 

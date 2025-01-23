@@ -2,17 +2,16 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { getUser } from "@/server/services/auth/get-user";
+import { Suspense } from "react";
 import { DashboardLink } from "./links/dashboard-link";
 import { DailyActionsSection } from "./sections/daily-actions-section";
 import { SettingsSection } from "./sections/setting-section";
 import { SidebarProfile } from "./sidebar-profile";
 
-export async function AppSidebar({ }) {
-  const user = await getUser();
-
+export async function AppSidebar({}) {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -23,8 +22,26 @@ export async function AppSidebar({ }) {
         <SettingsSection />
       </SidebarContent>
       <SidebarFooter>
-        <SidebarProfile user={user} />
+        <Suspense
+          fallback={
+            <SidebarProfile name={"loading"} email={"loading@example.com"} />
+          }
+        >
+          <SidebarProfileServerWrapper />
+        </Suspense>
       </SidebarFooter>
     </Sidebar>
+  );
+}
+
+async function SidebarProfileServerWrapper() {
+  const user = await getUser();
+
+  return (
+    <SidebarProfile
+      email={user.email}
+      name={user.name}
+      image={user.image ?? undefined}
+    />
   );
 }

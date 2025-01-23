@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -10,51 +10,61 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { colors } from "@/constants/colors"
-import { handleCreateCategoryAction } from "@/server/actions/category/create-category-action"
-import { Plus } from "lucide-react"
-import type { ReactElement } from "react"
-import { useRef, useState } from "react"
+} from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { colors } from "@/constants/colors";
+import type { Errors } from "@/server/actions/category/create-category-action";
+import { handleCreateCategoryAction } from "@/server/actions/category/create-category-action";
+import type { ActionState } from "@/types/action-state";
+import { Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { ReactElement } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export function CreateCategoryDrawer({ trigger, triggerAsChild }: {
+const initialState: ActionState<string, Errors> = {
+  status: "not-started",
+};
+
+export function CreateCategoryDrawer({
+  trigger,
+  triggerAsChild,
+}: {
   trigger: ReactElement;
   triggerAsChild?: boolean;
 }) {
-  const [open, setOpen] = useState(false)
-  const formRef = useRef<HTMLFormElement>(null)
+  const [state, action, pending] = useActionState(
+    handleCreateCategoryAction,
+    initialState,
+  );
 
-  const handleCreateCategory = async () => {
-    if (!formRef.current) {
-      console.log("Form not found")
+  const errors = state.status === "error" ? state.errors : {};
 
-      return
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.status === "success") {
+      toast.success(state.data);
+      router.refresh();
     }
-    const formData = new FormData(formRef.current)
-    const name = formData.get("name")
-    const color = formData.get("color")
+  }, [router, state]);
 
-    if (!name || !color) {
-      return
-    }
+  const [open, setOpen] = useState(false);
 
-    const data = await handleCreateCategoryAction({ color: String(color), name: String(name) })
-    console.log(data)
-    setOpen(false)
-  }
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("");
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild={triggerAsChild}>
-        {trigger}
-      </DrawerTrigger>
+      <DrawerTrigger asChild={triggerAsChild}>{trigger}</DrawerTrigger>
       <DrawerContent>
-        <form ref={formRef} action={handleCreateCategory} className="mx-auto w-full max-w-screen-sm">
+        <form action={action} className="mx-auto w-full max-w-screen-sm">
           <DrawerHeader>
             <DrawerTitle>Create New Category</DrawerTitle>
-            <DrawerDescription>Add a new category to your list.</DrawerDescription>
+            <DrawerDescription>
+              Add a new category to your list.
+            </DrawerDescription>
           </DrawerHeader>
           <div className="p-4 pb-0">
             <div className="space-y-4">
@@ -63,29 +73,46 @@ export function CreateCategoryDrawer({ trigger, triggerAsChild }: {
                 <Input
                   name="name"
                   autoComplete="off"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Enter category name"
-                  required
                 />
+                {errors?.name && (
+                  <p className="text-xs text-red-400">{errors?.name}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>Color</Label>
-                <div className="grid grid-cols-[repeat(8,1fr)] place-content-between gap-2 sm:grid-cols-[repeat(16,1fr)]">
+                <div className="grid grid-cols-[repeat(8,1fr)] place-content-between gap-3 sm:grid-cols-[repeat(16,1fr)]">
                   {colors.map(({ name, hex }) => (
-                    <label key={name} className="group/radio-color aspect-square">
-                      <input className="hidden" type="radio" name="color" value={hex} />
+                    <label
+                      key={name}
+                      className="group/radio-color aspect-square cursor-pointer rounded-full "
+                    >
+                      <input
+                        onChange={(e) => setColor(e.target.value)}
+                        checked={color === hex}
+                        className="hidden"
+                        type="radio"
+                        name="color"
+                        value={hex}
+                      />
                       <div
-                        className="size-full cursor-pointer rounded-full transition group-has-[input:checked]/radio-color:ring-2 group-has-[input:checked]/radio-color:ring-white"
+                        className="size-full rounded-full ring-white/75 transition hover:ring-4 group-has-[input:checked]/radio-color:ring-4 group-has-[input:checked]/radio-color:ring-white"
                         style={{ backgroundColor: hex }}
                       />
                     </label>
                   ))}
                 </div>
+                {errors?.color && (
+                  <p className="text-xs text-red-400">{errors?.color}</p>
+                )}
               </div>
             </div>
           </div>
           <DrawerFooter>
-            <Button type="submit">
-              <Plus />
+            <Button type="submit" disabled={pending}>
+              {pending ? <Loader2 className="animate-spin" /> : <Plus />}
               Create Category
             </Button>
             <DrawerClose asChild>
@@ -95,6 +122,5 @@ export function CreateCategoryDrawer({ trigger, triggerAsChild }: {
         </form>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }
-

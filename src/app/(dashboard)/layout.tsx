@@ -1,19 +1,20 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Suspense } from "react";
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main vaul-drawer-wrapper="true" className="min-h-dvh w-full px-8 py-4">
-        <div className="pb-4">
+    <Suspense>
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="min-h-dvh w-full space-y-4 px-8 py-4">
           <SidebarTrigger />
-        </div>
-        {children}
-      </main>
-    </SidebarProvider>
+          <Suspense>{children}</Suspense>
+        </main>
+      </SidebarProvider>
+    </Suspense>
   );
 }

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { SidebarMenuButton } from "@/components/ui/sidebar"
-import { LayoutDashboard } from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { SidebarMenuButton } from "@/components/ui/sidebar";
+import { LayoutDashboard } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export const DashboardLink = () => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <SidebarMenuButton
@@ -20,5 +20,5 @@ export const DashboardLink = () => {
         Dashboard
       </Link>
     </SidebarMenuButton>
-  )
-}
+  );
+};
