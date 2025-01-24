@@ -1,5 +1,7 @@
 import { getUser } from "@/server/services/auth/get-user";
 
+export const experimental_ppr = true;
+
 export default async function Home() {
   const user = await getUser();
 
