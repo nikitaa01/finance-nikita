@@ -52,12 +52,8 @@ function SidebarSkeletonProfile() {
   );
 }
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 async function SidebarProfileServerWrapper() {
   const user = await getUser();
-
-  await delay(2000);
 
   return (
     <SidebarProfile
