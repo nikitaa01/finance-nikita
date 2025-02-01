@@ -1,3 +1,4 @@
+import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import type { Category } from "@/server/db/schema/category";
 import type { CategoryTag } from "@/server/db/schema/category-tag";
@@ -13,7 +14,7 @@ export type CategoriesTableData = Category & { tags: CategoryTag[] };
 
 export default function Categories() {
   return (
-    <div className="mx-auto flex max-h-full w-full max-w-screen-sm flex-col gap-4">
+    <div className="mx-auto flex size-full max-w-screen-sm flex-col gap-4">
       <CreateCategoryDrawer
         triggerAsChild
         trigger={
@@ -23,7 +24,7 @@ export default function Categories() {
           </Button>
         }
       />
-      <Suspense>
+      <Suspense fallback={<Loader />}>
         <CategoriesTableWrapper />
       </Suspense>
     </div>

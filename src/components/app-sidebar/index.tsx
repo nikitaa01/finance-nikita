@@ -3,9 +3,12 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { getUser } from "@/server/services/auth/get-user";
+import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { Suspense } from "react";
+import { Skeleton } from "../ui/skeleton";
 import { DashboardLink } from "./links/dashboard-link";
 import { DailyActionsSection } from "./sections/daily-actions-section";
 import { SettingsSection } from "./sections/setting-section";
@@ -22,11 +25,7 @@ export async function AppSidebar({}) {
         <SettingsSection />
       </SidebarContent>
       <SidebarFooter>
-        <Suspense
-          fallback={
-            <SidebarProfile name={"loading"} email={"loading@example.com"} />
-          }
-        >
+        <Suspense fallback={<SidebarSkeletonProfile />}>
           <SidebarProfileServerWrapper />
         </Suspense>
       </SidebarFooter>
@@ -34,8 +33,31 @@ export async function AppSidebar({}) {
   );
 }
 
+function SidebarSkeletonProfile() {
+  return (
+    <SidebarMenuButton
+      size="lg"
+      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+    >
+      <Avatar className="size-8 rounded-lg">
+        <AvatarFallback className="rounded-lg">
+          <Skeleton className="size-full" />
+        </AvatarFallback>
+      </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="mt-1 h-3 w-32" />
+      </div>
+    </SidebarMenuButton>
+  );
+}
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function SidebarProfileServerWrapper() {
   const user = await getUser();
+
+  await delay(2000);
 
   return (
     <SidebarProfile
