@@ -16,14 +16,43 @@ import { Label } from "@/components/ui/label";
 import { colors } from "@/constants/colors";
 import type { Errors } from "@/server/actions/category/create-category-action";
 import { handleCreateCategoryAction } from "@/server/actions/category/create-category-action";
+import type { CategoryWithTags } from "@/stores/categories-store";
+import { useCategoriesStore } from "@/stores/categories-store";
 import type { ActionState } from "@/types/action-state";
 import { Loader2, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type { ReactElement } from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const initialState: ActionState<string, Errors> = {
+function useUpdateCategoriesOnSuccess({
+  state,
+  setOpen,
+}: {
+  state: typeof initialState;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  const addCategoryWithTags = useCategoriesStore(
+    (state) => state.addCategoryWithTags,
+  );
+
+  useEffect(() => {
+    if (state.status === "success") {
+      addCategoryWithTags(state.data.categoryWithTags);
+      toast.success(state.data.message);
+      setOpen(false);
+    }
+  }, [state, addCategoryWithTags, setOpen]);
+
+  return null;
+}
+
+const initialState: ActionState<
+  {
+    categoryWithTags: CategoryWithTags;
+    message: string;
+  },
+  Errors
+> = {
   status: "not-started",
 };
 
@@ -40,20 +69,12 @@ export function CreateCategoryDrawer({
   );
   const errors = state.status === "error" ? state.errors : {};
 
-  const router = useRouter();
-
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (state.status === "success") {
-      toast.success(state.data);
-      setOpen(false);
-      router.refresh();
-    }
-  }, [router, state]);
 
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
+
+  useUpdateCategoriesOnSuccess({ state, setOpen });
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>

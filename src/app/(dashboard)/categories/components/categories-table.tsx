@@ -1,11 +1,11 @@
 "use client";
 
 import { DataTable } from "@/components/data-table";
-import { Button } from "@/components/ui/button";
+import { useCategoriesStore } from "@/stores/categories-store";
 import type { ColumnDef } from "@tanstack/react-table";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
 import type { CategoriesTableData } from "../page";
+import { DeleteButton } from "./delete-category-button";
 import { EditableTag } from "./editable-tag";
 
 const columnHelper = createColumnHelper<CategoriesTableData>();
@@ -35,15 +35,22 @@ const columns = [
   }) as ColumnDef<CategoriesTableData, unknown>,
   columnHelper.display({
     header: "Actions",
-    maxSize: 10,
-    cell: () => (
-      <Button variant={"destructive"} size={"icon"}>
-        <Trash />
-      </Button>
-    ),
+    cell: ({ row }) => <DeleteButton id={row.original.id} />,
   }) as ColumnDef<CategoriesTableData, unknown>,
 ];
 
-export const CategoriesTable = ({ data }: { data: CategoriesTableData[] }) => {
-  return <DataTable columns={columns} data={data} />;
+export const CategoriesTable = () => {
+  const categoriesWithTags = useCategoriesStore(
+    (state) => state.categoriesWithTags,
+  );
+
+  console.log(categoriesWithTags);
+
+  return (
+    <DataTable
+      columns={columns}
+      data={categoriesWithTags}
+      getRowId={(row) => row.id.toString()}
+    />
+  );
 };

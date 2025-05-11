@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import type { Category } from "@/server/db/schema/category";
 import type { CategoryTag } from "@/server/db/schema/category-tag";
 import { getAllCategoriesWithTags } from "@/server/services/category/get-all-categories";
+import { CategoriesStoreProvider } from "@/stores/categories-store";
 import { PlusIcon } from "lucide-react";
 import { Suspense } from "react";
 import { CreateCategoryDrawer } from "../../../components/create-category-drawer";
@@ -15,26 +16,32 @@ export type CategoriesTableData = Category & { tags: CategoryTag[] };
 export default function Categories() {
   return (
     <div className="mx-auto flex size-full max-w-screen-sm flex-col gap-4">
-      <CreateCategoryDrawer
-        triggerAsChild
-        trigger={
-          <Button>
-            <PlusIcon />
-            Create Category
-          </Button>
-        }
-      />
       <Suspense fallback={<Loader />}>
-        <CategoriesTableWrapper />
+        <CategoriesDataLoader>
+          <CreateCategoryDrawer
+            triggerAsChild
+            trigger={
+              <Button>
+                <PlusIcon />
+                Create Category
+              </Button>
+            }
+          />
+          <CategoriesTable />
+        </CategoriesDataLoader>
       </Suspense>
     </div>
   );
 }
 
-async function CategoriesTableWrapper() {
+async function CategoriesDataLoader({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const allCategories = await getAllCategoriesWithTags();
 
-  const mapToDataTable = (
+  const mapToCategoriesWithTags = (
     categories: typeof allCategories,
   ): CategoriesTableData[] => {
     const data: Record<number, CategoriesTableData> = {};
@@ -53,5 +60,11 @@ async function CategoriesTableWrapper() {
     return Object.values(data);
   };
 
-  return <CategoriesTable data={mapToDataTable(allCategories)} />;
+  return (
+    <CategoriesStoreProvider
+      categoriesWithTags={mapToCategoriesWithTags(allCategories)}
+    >
+      {children}
+    </CategoriesStoreProvider>
+  );
 }

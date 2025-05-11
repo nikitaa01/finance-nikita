@@ -19,11 +19,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  getRowId: (row: TData) => string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  getRowId,
 }: DataTableProps<TData, TValue>) {
   // eslint-disable-next-line react-compiler/react-compiler
   "use no memo";
@@ -32,6 +34,7 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getRowId,
   });
 
   return (
