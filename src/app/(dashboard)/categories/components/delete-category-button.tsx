@@ -27,12 +27,7 @@ export function DeleteButton({ id }: { id: number }) {
   }, [state, deleteCategoryWithTags, id, pending]);
 
   return (
-    <form
-      action={action}
-      onSubmit={() => {
-        console.log("submitted");
-      }}
-    >
+    <form action={action}>
       <input type="hidden" name="id" value={id} />
       <Button variant={"ghost"} size={"icon"}>
         {pending ? <Loader2 className="animate-spin" /> : <Trash />}

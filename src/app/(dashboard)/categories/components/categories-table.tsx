@@ -44,8 +44,6 @@ export const CategoriesTable = () => {
     (state) => state.categoriesWithTags,
   );
 
-  console.log(categoriesWithTags);
-
   return (
     <DataTable
       columns={columns}
