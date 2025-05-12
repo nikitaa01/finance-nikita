@@ -1,4 +1,4 @@
-import type { InferSelectModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createdAtColumn, updatedAtColumn } from "../utils";
 import { category } from "./category";
@@ -18,3 +18,5 @@ export const categoryTag = sqliteTable("category-tag", {
 });
 
 export type CategoryTag = InferSelectModel<typeof categoryTag>;
+
+export type InsertCategoryTag = InferInsertModel<typeof categoryTag>;

@@ -1,20 +1,22 @@
 "use server";
 
+import type { CategoryTag } from "@/server/db/schema/category-tag";
 import { getUser } from "@/server/services/auth/get-user";
-import { createCategory } from "@/server/services/category/create-category";
-import type { CategoryWithTags } from "@/stores/categories-store";
+import { createCategoryTag } from "@/server/services/category-tag/create-category-tag";
+import { getIsUserCategory } from "@/server/services/category/is-user-category";
 import type { Action } from "@/types/action";
 import type { DrawerFormErrors } from "@/types/drawer-form";
 
-export const handleCreateCategoryAction: Action<
+export const handleCreateTagAction: Action<
   {
-    categoryWithTags: CategoryWithTags;
+    tag: CategoryTag;
     message: string;
   },
   DrawerFormErrors
 > = async (_, formData) => {
   const name = formData.get("name");
   const color = formData.get("color");
+  const categoryId = formData.get("categoryId");
 
   const errors: Record<string, string> = {};
   if (!name) {
@@ -23,42 +25,38 @@ export const handleCreateCategoryAction: Action<
   if (!color) {
     errors.color = "Color is required";
   }
+  if (!categoryId) {
+    errors.form = "Category is required";
+  }
   if (Object.keys(errors).length > 0) {
     return { status: "error", errors };
   }
 
   const user = await getUser();
 
+  const isUserCategory = await getIsUserCategory(Number(categoryId), user.id);
+  if (!isUserCategory) {
+    return {
+      status: "error",
+      errors: { form: "Category not found" },
+    };
+  }
+
   try {
-    const category = await createCategory({
+    const tag = await createCategoryTag({
       color: String(color),
       name: String(name),
-      userId: user.id,
+      categoryId: Number(categoryId),
     });
-
-    const categoryWithTags: CategoryWithTags = {
-      ...category,
-      tags: [],
-    };
 
     return {
       status: "success",
       data: {
-        categoryWithTags,
-        message: `Category ${name} created successfully`,
+        tag,
+        message: `Tag ${name} created successfully`,
       },
     };
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message ===
-        "SQLITE_CONSTRAINT: SQLite error: UNIQUE constraint failed: category.name, category.user_id"
-    ) {
-      return {
-        status: "error",
-        errors: { name: `Category with name ${name} already exists` },
-      };
-    }
+  } catch {
     return {
       status: "error",
       errors: { form: "An error occurred while creating the category" },

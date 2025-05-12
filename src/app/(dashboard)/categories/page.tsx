@@ -8,7 +8,6 @@ import { PlusIcon } from "lucide-react";
 import { Suspense } from "react";
 import { CreateCategoryDrawer } from "../../../components/create-category-drawer";
 import { CategoriesTable } from "./components/categories-table";
-
 export const experimental_ppr = true;
 
 export type CategoriesTableData = Category & { tags: CategoryTag[] };

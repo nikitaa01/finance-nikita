@@ -4,7 +4,7 @@ import { category } from "@/server/db/schema/category";
 
 export const createCategory = async (categoryData: InsertCategory) => {
   // Insert the category into the database
-  const newCategory = await db
+  const [newCategory] = await db
     .insert(category)
     .values(categoryData)
     .returning();

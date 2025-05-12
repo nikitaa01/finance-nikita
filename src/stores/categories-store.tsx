@@ -13,6 +13,7 @@ interface CategoriesStore {
   categoriesWithTags: CategoryWithTags[];
   addCategoryWithTags: (categoryWithTags: CategoryWithTags) => void;
   deleteCategoryWithTags: (id: number) => void;
+  addTagToCategory: (categoryId: number, tag: CategoryTag) => void;
 }
 
 export const categoriesStore = (
@@ -28,6 +29,14 @@ export const categoriesStore = (
       set((state) => ({
         categoriesWithTags: state.categoriesWithTags.filter(
           (category) => category.id !== id,
+        ),
+      })),
+    addTagToCategory: (categoryId: number, tag: CategoryTag) =>
+      set((state) => ({
+        categoriesWithTags: state.categoriesWithTags.map((category) =>
+          category.id === categoryId
+            ? { ...category, tags: [...category.tags, tag] }
+            : category,
         ),
       })),
   }));
