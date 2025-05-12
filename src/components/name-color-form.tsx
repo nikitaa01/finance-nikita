@@ -37,7 +37,7 @@ export function NameColorForm({ errors }: NameColorFormProps) {
 interface ColorPickerProps {
   color: string;
   setColor: (color: string) => void;
-  errors: Errors;
+  errors: DrawerFormErrors;
 }
 
 export function ColorPicker({ color, setColor, errors }: ColorPickerProps) {

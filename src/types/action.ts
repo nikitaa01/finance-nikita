@@ -1,4 +1,15 @@
-import type { ActionState } from "./action-state";
+export type ActionState<Data, Errors> =
+  | {
+      status: "not-started";
+    }
+  | {
+      status: "success";
+      data: Data;
+    }
+  | {
+      status: "error";
+      errors: Errors;
+    };
 
 export type Action<Data, Error> = (
   state: ActionState<Data, Error>,
