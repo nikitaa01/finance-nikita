@@ -11,34 +11,71 @@ export type CategoryWithTags = Category & { tags: CategoryTag[] };
 
 interface CategoriesStore {
   categoriesWithTags: CategoryWithTags[];
-  addCategoryWithTags: (categoryWithTags: CategoryWithTags) => void;
-  deleteCategoryWithTags: (id: number) => void;
-  addTagToCategory: (categoryId: number, tag: CategoryTag) => void;
+  addCategoryWithTags: (categoryWithTags: CategoryWithTags) => () => void;
+  deleteCategoryWithTags: (id: number) => () => void;
+  addTagToCategory: (categoryId: number, tag: CategoryTag) => () => void;
 }
 
 export const categoriesStore = (
   initialCategoriesWithTags: CategoryWithTags[],
 ) =>
-  createStore<CategoriesStore>((set) => ({
+  createStore<CategoriesStore>((set, get) => ({
     categoriesWithTags: initialCategoriesWithTags,
-    addCategoryWithTags: (categoryWithTags: CategoryWithTags) =>
+    addCategoryWithTags: (categoryWithTags: CategoryWithTags) => {
       set((state) => ({
         categoriesWithTags: [...state.categoriesWithTags, categoryWithTags],
-      })),
-    deleteCategoryWithTags: (id: number) =>
+      }));
+
+      return () => {
+        set((state) => ({
+          categoriesWithTags: state.categoriesWithTags.filter(
+            (category) => category.id !== categoryWithTags.id,
+          ),
+        }));
+      };
+    },
+    deleteCategoryWithTags: (id: number) => {
+      const categoryToDelete = get().categoriesWithTags.find(
+        (category) => category.id === id,
+      );
+
       set((state) => ({
         categoriesWithTags: state.categoriesWithTags.filter(
           (category) => category.id !== id,
         ),
-      })),
-    addTagToCategory: (categoryId: number, tag: CategoryTag) =>
+      }));
+
+      return () => {
+        if (!categoryToDelete) return;
+
+        set((state) => ({
+          categoriesWithTags: [...state.categoriesWithTags, categoryToDelete],
+        }));
+      };
+    },
+    addTagToCategory: (categoryId: number, tag: CategoryTag) => {
+      const categoryToUpdate = get().categoriesWithTags.find(
+        (category) => category.id === categoryId,
+      );
+
       set((state) => ({
         categoriesWithTags: state.categoriesWithTags.map((category) =>
           category.id === categoryId
             ? { ...category, tags: [...category.tags, tag] }
             : category,
         ),
-      })),
+      }));
+
+      return () => {
+        if (!categoryToUpdate) return;
+
+        set((state) => ({
+          categoriesWithTags: state.categoriesWithTags.map((category) =>
+            category.id === categoryId ? categoryToUpdate : category,
+          ),
+        }));
+      };
+    },
   }));
 
 const CategoriesStoreContext =
