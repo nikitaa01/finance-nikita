@@ -6,6 +6,7 @@ import type { RefObject } from "react";
 import { createContext, use, useRef } from "react";
 import type { StoreApi } from "zustand";
 import { createStore, useStore } from "zustand";
+import { optimistic } from "./optimistic";
 
 export type CategoryWithTags = Category & { tags: CategoryTag[] };
 
@@ -13,70 +14,71 @@ interface CategoriesStore {
   categoriesWithTags: CategoryWithTags[];
   addCategoryWithTags: (categoryWithTags: CategoryWithTags) => () => void;
   deleteCategoryWithTags: (id: number) => () => void;
+  updateCategoryWithTags: (
+    id: number,
+    categoryWithTags: CategoryWithTags,
+  ) => () => void;
   addTagToCategory: (categoryId: number, tag: CategoryTag) => () => void;
 }
 
 export const categoriesStore = (
   initialCategoriesWithTags: CategoryWithTags[],
 ) =>
-  createStore<CategoriesStore>((set, get) => ({
-    categoriesWithTags: initialCategoriesWithTags,
-    addCategoryWithTags: (categoryWithTags: CategoryWithTags) => {
-      set((state) => ({
-        categoriesWithTags: [...state.categoriesWithTags, categoryWithTags],
-      }));
+  createStore<CategoriesStore>(
+    optimistic<CategoriesStore>((set, get, api) => {
+      const categoriesWithTagsOptimisticActions = api.createOptimisticActions({
+        getItems: (state) => state.categoriesWithTags,
+        setItems: ({ items }) => ({ categoriesWithTags: items }),
+        getId: (item) => item.id,
+      });
 
-      return () => {
-        set((state) => ({
-          categoriesWithTags: state.categoriesWithTags.filter(
-            (category) => category.id !== categoryWithTags.id,
-          ),
-        }));
+      return {
+        categoriesWithTags: initialCategoriesWithTags,
+        addCategoryWithTags: (categoryWithTags: CategoryWithTags) => {
+          const reset =
+            categoriesWithTagsOptimisticActions.create(categoryWithTags);
+
+          return reset;
+        },
+        deleteCategoryWithTags: (id: number) => {
+          const reset = categoriesWithTagsOptimisticActions.delete(id);
+
+          return reset;
+        },
+        updateCategoryWithTags: (
+          id: number,
+          categoryWithTags: CategoryWithTags,
+        ) => {
+          const reset = categoriesWithTagsOptimisticActions.update(
+            id,
+            categoryWithTags,
+          );
+
+          return reset;
+        },
+        addTagToCategory: (categoryId: number, tag: CategoryTag) => {
+          const categoryToUpdate = structuredClone(
+            get().categoriesWithTags.find(
+              (category) => category.id === categoryId,
+            ),
+          );
+
+          if (!categoryToUpdate) {
+            return () => {};
+          }
+
+          categoryToUpdate.tags.push(tag);
+
+          const reset = categoriesWithTagsOptimisticActions.update(
+            categoryId,
+            categoryToUpdate,
+          );
+
+          return reset;
+        },
       };
-    },
-    deleteCategoryWithTags: (id: number) => {
-      const categoryToDelete = get().categoriesWithTags.find(
-        (category) => category.id === id,
-      );
-
-      set((state) => ({
-        categoriesWithTags: state.categoriesWithTags.filter(
-          (category) => category.id !== id,
-        ),
-      }));
-
-      return () => {
-        if (!categoryToDelete) return;
-
-        set((state) => ({
-          categoriesWithTags: [...state.categoriesWithTags, categoryToDelete],
-        }));
-      };
-    },
-    addTagToCategory: (categoryId: number, tag: CategoryTag) => {
-      const categoryToUpdate = get().categoriesWithTags.find(
-        (category) => category.id === categoryId,
-      );
-
-      set((state) => ({
-        categoriesWithTags: state.categoriesWithTags.map((category) =>
-          category.id === categoryId
-            ? { ...category, tags: [...category.tags, tag] }
-            : category,
-        ),
-      }));
-
-      return () => {
-        if (!categoryToUpdate) return;
-
-        set((state) => ({
-          categoriesWithTags: state.categoriesWithTags.map((category) =>
-            category.id === categoryId ? categoryToUpdate : category,
-          ),
-        }));
-      };
-    },
-  }));
+    }),
+  );
 
 const CategoriesStoreContext =
   createContext<RefObject<StoreApi<CategoriesStore> | null> | null>(null);
