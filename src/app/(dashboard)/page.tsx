@@ -1,6 +1,5 @@
 import { HydrateClient, api } from "@/trpc/server";
 import { Plus } from "lucide-react";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { AddExpenseForm } from "../_components/add-expense-form";
 import { TotalMonthlyExpensesNumber } from "../_components/total-monthly-expenses-number";
@@ -52,8 +51,7 @@ function HeaderSection() {
 }
 
 async function HeaderSectionDynamic() {
-  await connection();
-  void api.expenseCategory.getAllWithSubcategories.prefetch();
+  await api.expenseCategory.getAllWithSubcategories.prefetch();
   return (
     <HydrateClient>
       <AddExpenseForm />
@@ -84,8 +82,7 @@ async function TotalMonthlyExpensesSection() {
 }
 
 async function TotalMonthlyExpensesSectionDynamic() {
-  await connection();
-  void api.expense.getTotalMonthlyExpenses.prefetch();
+  await api.expense.getTotalMonthlyExpenses.prefetch();
 
   return (
     <HydrateClient>
