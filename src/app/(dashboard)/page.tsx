@@ -17,7 +17,7 @@ import { H1, H3, P } from "../_components/ui/typography";
 
 export default function Home() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       <HeaderSection />
       <TotalMonthlyExpensesSection />
     </div>
