@@ -19,7 +19,7 @@ export const expenseRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           amount: input.amount,
           date: input.date,
-          expenseSubcategoryId: String(input.expenseSubcategoryId),
+          expenseSubcategoryId: input.expenseSubcategoryId,
         })
         .returning();
     }),

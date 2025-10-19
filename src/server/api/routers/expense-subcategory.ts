@@ -33,7 +33,7 @@ export const expenseSubcategoryRouter = createTRPCRouter({
         .values({
           name: input.name,
           color: input.color,
-          expenseCategoryId: String(input.expenseCategoryId),
+          expenseCategoryId: input.expenseCategoryId,
         })
         .returning();
       return subcategory;
