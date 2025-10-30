@@ -1,7 +1,6 @@
 "use client";
-
 import type { ExpenseSubcategory } from "@/server/db/schemas/expense-subcategory";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { Check, ChevronDownIcon, Loader2, Plus } from "lucide-react";
 import { Suspense, useState } from "react";
 import { cn } from "../_lib/utils";
@@ -20,20 +19,29 @@ import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Muted } from "./ui/typography";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
 export const AddExpenseForm = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const utils = api.useUtils();
+  const api = useTRPC();
+  const queryClient = useQueryClient();
   const [amount, setAmount] = useState<number | undefined>(undefined);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [subcategory, setSubcategory] = useState<
     ExpenseSubcategory | undefined
   >(undefined);
-  const { mutate: createExpense, isPending } = api.expense.create.useMutation({
-    onSettled: () => {},
-    onSuccess: () => {
-      onSuccess?.();
-      utils.expense.invalidate();
-    },
-  });
+  const { mutate: createExpense, isPending } = useMutation(
+    api.expense.create.mutationOptions({
+      onSettled: () => {},
+      onSuccess: () => {
+        onSuccess?.();
+        queryClient.invalidateQueries(api.expense.pathFilter());
+      },
+    }),
+  );
 
   const handleSubmit = () => {
     if (!amount || !date || !subcategory) {
@@ -114,8 +122,10 @@ function SubcategorySelectorField({
   subcategory: ExpenseSubcategory | undefined;
   setSubcategory: (subcategory: ExpenseSubcategory | undefined) => void;
 }) {
-  const [categoriesWithSubcategories] =
-    api.expenseCategory.getAllWithSubcategories.useSuspenseQuery();
+  const api = useTRPC();
+  const { data: categoriesWithSubcategories } = useSuspenseQuery(
+    api.expenseCategory.getAllWithSubcategories.queryOptions(),
+  );
   const [open, setOpen] = useState(false);
 
   return (

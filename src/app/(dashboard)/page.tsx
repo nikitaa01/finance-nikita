@@ -41,9 +41,7 @@ function HeaderSection() {
           <DialogDescription>
             Add a new expense to your account
           </DialogDescription>
-          <Suspense fallback={<div>Loading...</div>}>
-            <HeaderSectionDynamic />
-          </Suspense>
+          <HeaderSectionDynamic />
         </DialogContent>
       </Dialog>
     </section>
@@ -51,11 +49,14 @@ function HeaderSection() {
 }
 
 async function HeaderSectionDynamic() {
-  await api.expenseCategory.getAllWithSubcategories.prefetch();
   return (
-    <HydrateClient>
-      <AddExpenseForm />
-    </HydrateClient>
+    <Suspense fallback={<div>Loading...</div>}>
+      <HydrateClient
+        queryOptions={api.expenseCategory.getAllWithSubcategories.queryOptions()}
+      >
+        <AddExpenseForm />
+      </HydrateClient>
+    </Suspense>
   );
 }
 
@@ -67,26 +68,26 @@ async function TotalMonthlyExpensesSection() {
         The total amount of expenses for the current month.
       </P>
       <div className="mt-6">
-        <Suspense
-          fallback={
-            <H1>
-              <Skeleton className="h-10 w-[10ch]" />
-            </H1>
-          }
-        >
-          <TotalMonthlyExpensesSectionDynamic />
-        </Suspense>
+        <TotalMonthlyExpensesSectionDynamic />
       </div>
     </section>
   );
 }
 
 async function TotalMonthlyExpensesSectionDynamic() {
-  await api.expense.getTotalMonthlyExpenses.prefetch();
-
   return (
-    <HydrateClient>
-      <TotalMonthlyExpensesNumber />
-    </HydrateClient>
+    <Suspense
+      fallback={
+        <H1>
+          <Skeleton className="h-10 w-[10ch]" />
+        </H1>
+      }
+    >
+      <HydrateClient
+        queryOptions={api.expense.getTotalMonthlyExpenses.queryOptions()}
+      >
+        <TotalMonthlyExpensesNumber />
+      </HydrateClient>
+    </Suspense>
   );
 }

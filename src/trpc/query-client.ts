@@ -4,10 +4,15 @@ import {
   QueryClient,
   defaultShouldDehydrateQuery,
 } from "@tanstack/react-query";
-import { TRPCClientError } from "@trpc/react-query";
+import { TRPCClientError } from "@trpc/client";
+import { TRPCError } from "@trpc/server";
+import { redirect } from "next/navigation";
 import SuperJSON from "superjson";
 
 function handleUnauthorizedError(error: Error) {
+  if (error instanceof TRPCError && error.code === "UNAUTHORIZED") {
+    redirect("/login");
+  }
   if (error instanceof TRPCClientError && error.message === "UNAUTHORIZED") {
     window.location.replace("/login");
   }

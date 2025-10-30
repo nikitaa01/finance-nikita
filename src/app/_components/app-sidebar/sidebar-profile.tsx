@@ -21,6 +21,7 @@ import {
 } from "@/app/_components/ui/sidebar";
 import { authClient } from "@/auth-client";
 import { ChevronsUpDown, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const SidebarProfile = ({
   image,
@@ -32,9 +33,10 @@ export const SidebarProfile = ({
   email: string;
 }) => {
   const { isMobile } = useSidebar();
+  const router = useRouter();
   const logOut = async () => {
     await authClient.signOut();
-    window.location.reload();
+    router.refresh();
   };
 
   return (

@@ -5,7 +5,7 @@ import {
   SidebarHeader,
   SidebarMenuButton,
 } from "@/app/_components/ui/sidebar";
-import { api } from "@/trpc/server";
+import { api, getQueryClient } from "@/trpc/server";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { Suspense } from "react";
 import { Skeleton } from "../ui/skeleton";
@@ -53,7 +53,8 @@ function SidebarSkeletonProfile() {
 }
 
 async function SidebarProfileServerWrapper() {
-  const user = await api.user.getUser();
+  const queryClient = getQueryClient();
+  const user = await queryClient.fetchQuery(api.user.getUser.queryOptions());
 
   return (
     <SidebarProfile

@@ -1,7 +1,8 @@
 "use client";
-
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { H1 } from "./ui/typography";
+
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const priceFormatter = new Intl.NumberFormat("es-ES", {
   style: "currency",
@@ -9,7 +10,9 @@ const priceFormatter = new Intl.NumberFormat("es-ES", {
 });
 
 export const TotalMonthlyExpensesNumber = () => {
-  const [totalMonthlyExpenses] =
-    api.expense.getTotalMonthlyExpenses.useSuspenseQuery();
+  const api = useTRPC();
+  const { data: totalMonthlyExpenses } = useSuspenseQuery(
+    api.expense.getTotalMonthlyExpenses.queryOptions(),
+  );
   return <H1>{priceFormatter.format(totalMonthlyExpenses)}</H1>;
 };
