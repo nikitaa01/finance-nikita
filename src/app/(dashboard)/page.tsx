@@ -1,7 +1,7 @@
 import { HydrateClient, api } from "@/trpc/server";
 import { Plus } from "lucide-react";
 import { Suspense } from "react";
-import { AddExpenseForm } from "../_components/add-expense-form";
+import { AddExpenseFormWithClose } from "../_components/add-expense-form-with-close";
 import { TotalMonthlyExpensesNumber } from "../_components/total-monthly-expenses-number";
 import { Button } from "../_components/ui/button";
 import {
@@ -41,7 +41,9 @@ function HeaderSection() {
           <DialogDescription>
             Add a new expense to your account
           </DialogDescription>
-          <HeaderSectionDynamic />
+          <Suspense fallback={<div>Loading...</div>}>
+            <HeaderSectionDynamic />
+          </Suspense>
         </DialogContent>
       </Dialog>
     </section>
@@ -50,13 +52,11 @@ function HeaderSection() {
 
 async function HeaderSectionDynamic() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HydrateClient
-        queryOptions={api.expenseCategory.getAllWithSubcategories.queryOptions()}
-      >
-        <AddExpenseForm />
-      </HydrateClient>
-    </Suspense>
+    <HydrateClient
+      queryOptions={api.expenseCategory.getAllWithSubcategories.queryOptions()}
+    >
+      <AddExpenseFormWithClose />
+    </HydrateClient>
   );
 }
 
@@ -68,7 +68,15 @@ async function TotalMonthlyExpensesSection() {
         The total amount of expenses for the current month.
       </P>
       <div className="mt-6">
-        <TotalMonthlyExpensesSectionDynamic />
+        <Suspense
+          fallback={
+            <H1>
+              <Skeleton className="h-10 w-[10ch]" />
+            </H1>
+          }
+        >
+          <TotalMonthlyExpensesSectionDynamic />
+        </Suspense>
       </div>
     </section>
   );
@@ -76,18 +84,10 @@ async function TotalMonthlyExpensesSection() {
 
 async function TotalMonthlyExpensesSectionDynamic() {
   return (
-    <Suspense
-      fallback={
-        <H1>
-          <Skeleton className="h-10 w-[10ch]" />
-        </H1>
-      }
+    <HydrateClient
+      queryOptions={api.expense.getTotalMonthlyExpenses.queryOptions()}
     >
-      <HydrateClient
-        queryOptions={api.expense.getTotalMonthlyExpenses.queryOptions()}
-      >
-        <TotalMonthlyExpensesNumber />
-      </HydrateClient>
-    </Suspense>
+      <TotalMonthlyExpensesNumber />
+    </HydrateClient>
   );
 }
