@@ -11,7 +11,7 @@ export function AddExpenseFormWithClose() {
     <>
       <DialogClose ref={closeRef} className="hidden" />
       <AddExpenseForm
-        onSuccess={() => {
+        onSubmit={() => {
           closeRef.current?.click();
         }}
       />
