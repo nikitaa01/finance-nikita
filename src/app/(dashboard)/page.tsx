@@ -37,7 +37,7 @@ function HeaderSection() {
             <Plus /> Add Expense
           </Button>
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="rounded-l-md">
           <DrawerTitle>Add Expense</DrawerTitle>
           <DrawerDescription>
             Add a new expense to your account

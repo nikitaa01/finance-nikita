@@ -9,6 +9,7 @@ import {
 import { Check, ChevronDownIcon, Loader2, Plus } from "lucide-react";
 import { Suspense, useState } from "react";
 import { cn } from "../_lib/utils";
+import { AddExpenseSubcategoryForm } from "./add-subcategory-form";
 import { Button } from "./ui/button";
 import {
   Command,
@@ -30,12 +31,21 @@ import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Muted } from "./ui/typography";
 
+export type TCreateSubcategoryWrapper = React.FC<{
+  children: React.FC<{
+    onSuccess: (subcategory: ExpenseSubcategory | undefined) => void;
+  }>;
+}>;
+
+export type TCreateSubcategoryWrapperProps =
+  Parameters<TCreateSubcategoryWrapper>[0];
+
 export const AddExpenseForm = ({
   onSubmit,
   CreateSubcategoryWrapper,
 }: {
   onSubmit?: () => void;
-  CreateSubcategoryWrapper: React.FC<{ children: React.ReactNode }>;
+  CreateSubcategoryWrapper: TCreateSubcategoryWrapper;
 }) => {
   const api = useTRPC();
   const queryClient = useQueryClient();
@@ -206,7 +216,7 @@ function SubcategorySelectorField({
   setSubcategory,
   error,
 }: {
-  CreateSubcategoryWrapper: React.FC<{ children: React.ReactNode }>;
+  CreateSubcategoryWrapper: TCreateSubcategoryWrapper;
   subcategory: ExpenseSubcategory | undefined;
   setSubcategory: (subcategory: ExpenseSubcategory | undefined) => void;
   error?: string;
@@ -221,10 +231,18 @@ function SubcategorySelectorField({
       <div className="flex justify-between">
         <FieldLabel>Subcategory</FieldLabel>
         <CreateSubcategoryWrapper>
-          <AddExpenseSubcategoryForm />
+          {({ onSuccess }) => (
+            <AddExpenseSubcategoryForm
+              onSuccess={(data) => {
+                onSuccess(data);
+                setSubcategory(data);
+              }}
+              categoriesWithSubcategories={categoriesWithSubcategories}
+            />
+          )}
         </CreateSubcategoryWrapper>
       </div>
-      <CategorySelectorPopover
+      <SubcategorySelectorPopover
         categoriesWithSubcategories={categoriesWithSubcategories}
         selectedSubcategory={selectedSubcategory}
         setSubcategory={setSubcategory}
@@ -234,7 +252,7 @@ function SubcategorySelectorField({
   );
 }
 
-function CategorySelectorPopover({
+function SubcategorySelectorPopover({
   categoriesWithSubcategories,
   selectedSubcategory,
   setSubcategory,
@@ -249,7 +267,13 @@ function CategorySelectorPopover({
       <PopoverTrigger asChild>
         <Button variant="outline" className="justify-between font-normal">
           {selectedSubcategory ? (
-            selectedSubcategory.name
+            <div className="flex items-center gap-2">
+              <div
+                className="size-4 rounded-full"
+                style={{ backgroundColor: selectedSubcategory.color }}
+              />
+              {selectedSubcategory.name}
+            </div>
           ) : (
             <Muted>Select subcategory</Muted>
           )}
@@ -258,7 +282,7 @@ function CategorySelectorPopover({
       </PopoverTrigger>
       <PopoverContent className="p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search framework..." className="h-9" />
+          <CommandInput placeholder="Search subcategory..." className="h-9" />
           <CommandList>
             <CommandEmpty>No subcategory found.</CommandEmpty>
             {categoriesWithSubcategories.map((category) => (
@@ -272,7 +296,13 @@ function CategorySelectorPopover({
                       setOpen(false);
                     }}
                   >
-                    {subcategory.name}{" "}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="size-4 rounded-full"
+                        style={{ backgroundColor: subcategory.color }}
+                      />
+                      {subcategory.name}
+                    </div>
                     <Check
                       className={cn(
                         "ml-auto",
@@ -303,39 +333,5 @@ function SubmitButton({
     <Button type="submit" disabled={disabled}>
       {isPending ? <Loader2 className="animate-spin" /> : <Plus />} Add Expense
     </Button>
-  );
-}
-
-function AddExpenseSubcategoryForm() {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-    >
-      <FieldSet>
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="name">Name</FieldLabel>
-            <Input
-              id="name"
-              type="text"
-              name="name"
-              autoComplete="off"
-              placeholder="e.g. Groceries"
-            />
-          </Field>
-
-          <Field>
-            <FieldLabel>Color</FieldLabel>
-            <Input type="color" />
-          </Field>
-        </FieldGroup>
-        <Button type="submit" size={"sm"}>
-          <Plus /> Add Subcategory
-        </Button>
-      </FieldSet>
-    </form>
   );
 }

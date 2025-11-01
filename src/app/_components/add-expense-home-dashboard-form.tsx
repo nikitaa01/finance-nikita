@@ -1,9 +1,11 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type React from "react";
 import { useRef } from "react";
-import { AddExpenseForm } from "./add-expense-form";
+import {
+  AddExpenseForm,
+  type TCreateSubcategoryWrapperProps,
+} from "./add-expense-form";
 import { Button } from "./ui/button";
 import {
   DrawerClose,
@@ -30,7 +32,15 @@ export function AddExpenseHomeDashboardForm() {
   );
 }
 
-function CreateSubcategoryWrapper({ children }: { children: React.ReactNode }) {
+function CreateSubcategoryWrapper({
+  children,
+}: TCreateSubcategoryWrapperProps) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const handleClose = () => {
+    closeRef.current?.click();
+  };
+  const Component = children;
+
   return (
     <NestedDrawer direction="right">
       <DrawerTrigger asChild>
@@ -38,12 +48,15 @@ function CreateSubcategoryWrapper({ children }: { children: React.ReactNode }) {
           <Plus />
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="rounded-l-md">
+        <DrawerClose ref={closeRef} className="hidden" />
         <DrawerTitle>Add Subcategory</DrawerTitle>
         <DrawerDescription>
           Add a new subcategory to your account
         </DrawerDescription>
-        <div className="mt-6">{children}</div>
+        <div className="mt-6">
+          <Component onSuccess={handleClose} />
+        </div>
       </DrawerContent>
     </NestedDrawer>
   );

@@ -1,5 +1,6 @@
 import { expenseCategory } from "@/server/db/schemas/expense-category";
 import { expenseSubcategory } from "@/server/db/schemas/expense-subcategory";
+import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import z from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -28,6 +29,17 @@ export const expenseSubcategoryRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const expenseCategoryUserId = await ctx.db
+        .select({ userId: expenseCategory.userId })
+        .from(expenseCategory)
+        .where(eq(expenseCategory.id, input.expenseCategoryId))
+        .limit(1)
+        .get();
+
+      if (expenseCategoryUserId?.userId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
       const [subcategory] = await ctx.db
         .insert(expenseSubcategory)
         .values({

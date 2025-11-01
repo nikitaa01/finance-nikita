@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { Suspense } from "react";
+import { ThemeProvider } from "./_components/there-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -15,13 +16,20 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className="min-h-[100dvh]">
-        <div vaul-drawer-wrapper="">
-          <Suspense>
-            <TRPCReactProvider>{children}</TRPCReactProvider>
-          </Suspense>
-        </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div>
+            <Suspense>
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </Suspense>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
