@@ -17,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="min-h-[100dvh]">
-        <Suspense>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </Suspense>
+        <div vaul-drawer-wrapper="">
+          <Suspense>
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </Suspense>
+        </div>
       </body>
     </html>
   );

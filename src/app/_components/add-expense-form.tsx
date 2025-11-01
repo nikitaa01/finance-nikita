@@ -1,10 +1,4 @@
 "use client";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/app/_components/ui/dialog";
 import type { ExpenseSubcategory } from "@/server/db/schemas/expense-subcategory";
 import { type RouterOutputs, useTRPC } from "@/trpc/react";
 import {
@@ -36,7 +30,13 @@ import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Muted } from "./ui/typography";
 
-export const AddExpenseForm = ({ onSubmit }: { onSubmit?: () => void }) => {
+export const AddExpenseForm = ({
+  onSubmit,
+  CreateSubcategoryWrapper,
+}: {
+  onSubmit?: () => void;
+  CreateSubcategoryWrapper: React.FC<{ children: React.ReactNode }>;
+}) => {
   const api = useTRPC();
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState<number | undefined>(undefined);
@@ -135,6 +135,7 @@ export const AddExpenseForm = ({ onSubmit }: { onSubmit?: () => void }) => {
                 setErrors((prev) => ({ ...prev, subcategory: undefined }));
               }}
               error={errors.subcategory}
+              CreateSubcategoryWrapper={CreateSubcategoryWrapper}
             />
           </Suspense>
         </FieldGroup>
@@ -200,10 +201,12 @@ function DateField({
 }
 
 function SubcategorySelectorField({
+  CreateSubcategoryWrapper,
   subcategory: selectedSubcategory,
   setSubcategory,
   error,
 }: {
+  CreateSubcategoryWrapper: React.FC<{ children: React.ReactNode }>;
   subcategory: ExpenseSubcategory | undefined;
   setSubcategory: (subcategory: ExpenseSubcategory | undefined) => void;
   error?: string;
@@ -217,17 +220,9 @@ function SubcategorySelectorField({
     <Field data-invalid={Boolean(error)}>
       <div className="flex justify-between">
         <FieldLabel>Subcategory</FieldLabel>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" type="button" size="icon">
-              <Plus />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogTitle>Add Subcategory</DialogTitle>
-            <AddExpenseSubcategoryForm />
-          </DialogContent>
-        </Dialog>
+        <CreateSubcategoryWrapper>
+          <AddExpenseSubcategoryForm />
+        </CreateSubcategoryWrapper>
       </div>
       <CategorySelectorPopover
         categoriesWithSubcategories={categoriesWithSubcategories}

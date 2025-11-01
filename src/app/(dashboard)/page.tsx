@@ -2,16 +2,16 @@ import { HydrateClient, api } from "@/trpc/server";
 import { Plus } from "lucide-react";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { AddExpenseFormWithClose } from "../_components/add-expense-form-with-close";
+import { AddExpenseHomeDashboardForm } from "../_components/add-expense-home-dashboard-form";
 import { TotalMonthlyExpensesNumber } from "../_components/total-monthly-expenses-number";
 import { Button } from "../_components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "../_components/ui/dialog";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../_components/ui/drawer";
 import { Skeleton } from "../_components/ui/skeleton";
 import { H1, H3, P } from "../_components/ui/typography";
 
@@ -31,22 +31,24 @@ function HeaderSection() {
         <H1>Dashboard</H1>
         <P className="mt-2!">Track and manage your daily expenses</P>
       </div>
-      <Dialog>
-        <DialogTrigger asChild>
+      <Drawer direction="right">
+        <DrawerTrigger asChild>
           <Button>
             <Plus /> Add Expense
           </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogTitle>Add Expense</DialogTitle>
-          <DialogDescription>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerTitle>Add Expense</DrawerTitle>
+          <DrawerDescription>
             Add a new expense to your account
-          </DialogDescription>
-          <Suspense fallback={<div>Loading...</div>}>
-            <HeaderSectionDynamic />
-          </Suspense>
-        </DialogContent>
-      </Dialog>
+          </DrawerDescription>
+          <div className="mt-6">
+            <Suspense fallback={<div>Loading...</div>}>
+              <HeaderSectionDynamic />
+            </Suspense>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </section>
   );
 }
@@ -57,11 +59,10 @@ async function HeaderSectionDynamic() {
     <HydrateClient
       queryOptions={api.expenseCategory.getAllWithSubcategories.queryOptions()}
     >
-      <AddExpenseFormWithClose />
+      <AddExpenseHomeDashboardForm />
     </HydrateClient>
   );
 }
-
 async function TotalMonthlyExpensesSection() {
   return (
     <section className="rounded-md border px-6 py-4">
