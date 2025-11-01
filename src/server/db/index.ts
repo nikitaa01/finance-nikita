@@ -9,12 +9,21 @@ const globalForDb = globalThis as unknown as {
   client: Client | undefined;
 };
 
+// Check if we should use local SQLite database
+const useLocalDb =
+  process.env.USE_LOCAL_DB === "true" || process.env.SQLITE_PATH;
+const sqlitePath = process.env.SQLITE_PATH ?? "./local.db";
+
 export const client =
   globalForDb.client ??
-  createClient({
-    url: process.env.TURSO_CONNECTION_URL as string,
-    authToken: process.env.TURSO_AUTH_TOKEN as string,
-  });
+  (useLocalDb
+    ? createClient({
+        url: `file:${sqlitePath}`,
+      })
+    : createClient({
+        url: process.env.TURSO_CONNECTION_URL as string,
+        authToken: process.env.TURSO_AUTH_TOKEN as string,
+      }));
 if (process.env.NODE_ENV !== "production") globalForDb.client = client;
 
 export const db = drizzle(client, { schema: authSchema });

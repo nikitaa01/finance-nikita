@@ -16,7 +16,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark">
-      <body>
+      <body className="min-h-[100dvh]">
         <Suspense>
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </Suspense>
