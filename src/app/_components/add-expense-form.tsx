@@ -290,7 +290,6 @@ function SubcategorySelectorPopover({
                 {category.subcategories.map((subcategory) => (
                   <CommandItem
                     key={subcategory.id}
-                    value={String(subcategory.id)}
                     onSelect={() => {
                       setSubcategory(subcategory);
                       setOpen(false);

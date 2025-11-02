@@ -25,9 +25,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div>
-            <Suspense>
-              <TRPCReactProvider>{children}</TRPCReactProvider>
-            </Suspense>
+            <TRPCReactProvider>
+              <Suspense>{children}</Suspense>
+            </TRPCReactProvider>
           </div>
         </ThemeProvider>
       </body>
