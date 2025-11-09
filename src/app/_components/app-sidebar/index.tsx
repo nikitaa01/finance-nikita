@@ -10,7 +10,6 @@ import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { Suspense } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { DashboardLink } from "./links/dashboard-link";
-import { DailyActionsSection } from "./sections/daily-actions-section";
 import { SettingsSection } from "./sections/setting-section";
 import { SidebarProfile } from "./sidebar-profile";
 
@@ -21,7 +20,6 @@ export function AppSidebar() {
         <DashboardLink />
       </SidebarHeader>
       <SidebarContent>
-        <DailyActionsSection />
         <SettingsSection />
       </SidebarContent>
       <SidebarFooter>
