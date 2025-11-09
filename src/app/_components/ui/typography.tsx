@@ -72,3 +72,10 @@ export const Muted = ({
     <p className={cn("text-muted-foreground text-sm", className)}>{children}</p>
   );
 };
+
+export const Small = ({
+  children,
+  className,
+}: { children: React.ReactNode; className?: string }) => {
+  return <small className={cn("text-sm", className)}>{children}</small>;
+};

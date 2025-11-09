@@ -6,7 +6,7 @@ import {
   type ExpenseSubcategory,
   expenseSubcategory,
 } from "@/server/db/schemas/expense-subcategory";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import z from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -81,5 +81,39 @@ export const expenseCategoryRouter = createTRPCRouter({
         .returning();
 
       return category;
+    }),
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        color: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [category] = await ctx.db
+        .update(expenseCategory)
+        .set(input)
+        .where(
+          and(
+            eq(expenseCategory.id, input.id),
+            eq(expenseCategory.userId, `${ctx.session.user.id}1`), // TODO: remove hardcoded 1
+          ),
+        )
+        .returning();
+
+      return category;
+    }),
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .delete(expenseCategory)
+        .where(
+          and(
+            eq(expenseCategory.id, input.id),
+            eq(expenseCategory.userId, ctx.session.user.id),
+          ),
+        );
     }),
 });

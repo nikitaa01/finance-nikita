@@ -5,7 +5,6 @@ import type { ExpenseSubcategory } from "@/server/db/schemas/expense-subcategory
 import { type RouterOutputs, useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronDownIcon, Loader2, Plus } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { colors } from "../_constants/colors";
 import { cn } from "../_lib/utils";
@@ -143,10 +142,7 @@ function CategorySelectorField({
 }) {
   return (
     <Field data-invalid={Boolean(error)}>
-      <div className="flex justify-between">
-        <FieldLabel>Category</FieldLabel>
-        <Link href={"/categories"}>Categories</Link>
-      </div>
+      <FieldLabel>Category</FieldLabel>
       <CategorySelectorPopover
         categoriesWithSubcategories={categoriesWithSubcategories}
         selectedCategory={category}

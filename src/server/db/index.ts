@@ -1,6 +1,9 @@
 import { type Client, createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as authSchema from "./schemas/auth-schema";
+import * as expenseSchema from "./schemas/expense";
+import * as expenseCategorySchema from "./schemas/expense-category";
+import * as expenseSubcategorySchema from "./schemas/expense-subcategory";
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR
  * update.
@@ -26,4 +29,11 @@ export const client =
       }));
 if (process.env.NODE_ENV !== "production") globalForDb.client = client;
 
-export const db = drizzle(client, { schema: authSchema });
+export const db = drizzle(client, {
+  schema: {
+    ...authSchema,
+    ...expenseCategorySchema,
+    ...expenseSubcategorySchema,
+    ...expenseSchema,
+  },
+});
