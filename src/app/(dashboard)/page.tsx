@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AddExpenseHomeDashboardForm } from "../_components/add-expense-home-dashboard-form";
+import { ExpensesByDayAndSubcategoryChart } from "../_components/expenses-by-day-and-subcategory-chart";
 import { TotalMonthlyExpensesNumber } from "../_components/total-monthly-expenses-number";
 import { Button } from "../_components/ui/button";
 import {
@@ -20,6 +21,7 @@ export default function Home() {
     <div className="space-y-8">
       <HeaderSection />
       <TotalMonthlyExpensesSection />
+      <ExpensesByDayAndSubcategorySection />
     </div>
   );
 }
@@ -92,6 +94,31 @@ async function TotalMonthlyExpensesSectionDynamic() {
       queryOptions={api.expense.getTotalMonthlyExpenses.queryOptions()}
     >
       <TotalMonthlyExpensesNumber />
+    </HydrateClient>
+  );
+}
+
+async function ExpensesByDayAndSubcategorySection() {
+  return (
+    <section className="rounded-md border px-6 py-4">
+      <H3>Expenses by Day and Subcategory</H3>
+      <P className="mt-2!">
+        The expenses by day and subcategory for the current month.
+      </P>
+      <ExpensesByDayAndSubcategorySectionDynamic />
+    </section>
+  );
+}
+
+async function ExpensesByDayAndSubcategorySectionDynamic() {
+  await connection();
+  return (
+    <HydrateClient
+      queryOptions={api.expense.getMonthlyExpensesByDayAndSubcategory.queryOptions()}
+    >
+      <div className="h-96 w-full max-w-full">
+        <ExpensesByDayAndSubcategoryChart />
+      </div>
     </HydrateClient>
   );
 }

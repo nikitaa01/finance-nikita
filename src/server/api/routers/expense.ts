@@ -1,4 +1,5 @@
 import { expense } from "@/server/db/schemas/expense";
+import { expenseSubcategory } from "@/server/db/schemas/expense-subcategory";
 import { and, eq, gte, lte, sql } from "drizzle-orm";
 import z from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -42,4 +43,72 @@ export const expenseRouter = createTRPCRouter({
 
     return totalMonthlyExpenses?.total ?? 0;
   }),
+  getMonthlyExpensesByDayAndSubcategory: protectedProcedure.query(
+    async ({ ctx }) => {
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      const monthlyExpenses = await ctx.db
+        .select({
+          date: expense.date,
+          amount: expense.amount,
+          subcategoryColor: expenseSubcategory.color,
+          subcategoryName: expenseSubcategory.name,
+        })
+        .from(expense)
+        .innerJoin(
+          expenseSubcategory,
+          eq(expense.expenseSubcategoryId, expenseSubcategory.id),
+        )
+        .where(
+          and(
+            eq(expense.userId, ctx.session.user.id),
+            gte(expense.date, firstDay),
+            lte(expense.date, now),
+          ),
+        );
+
+      const expensesGroupedByDay = new Map<
+        string,
+        {
+          date: string;
+          entries: Map<string, { amount: number; color: string }>;
+        }
+      >();
+
+      for (const expenseEntry of monthlyExpenses) {
+        const year = expenseEntry.date.getFullYear();
+        const month = String(expenseEntry.date.getMonth() + 1).padStart(2, "0");
+        const day = String(expenseEntry.date.getDate()).padStart(2, "0");
+        const dayKey = `${year}-${month}-${day}`;
+        let dayEntry = expensesGroupedByDay.get(dayKey);
+        if (!dayEntry) {
+          dayEntry = { date: dayKey, entries: new Map() };
+          expensesGroupedByDay.set(dayKey, dayEntry);
+        }
+
+        const currentTotal = dayEntry.entries.get(
+          expenseEntry.subcategoryName,
+        ) ?? { amount: 0, color: "" };
+
+        dayEntry.entries.set(expenseEntry.subcategoryName, {
+          amount: currentTotal.amount + expenseEntry.amount,
+          color: expenseEntry.subcategoryColor,
+        });
+      }
+
+      return Array.from(expensesGroupedByDay.values())
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map((entry) => ({
+          date: entry.date,
+          entries: Array.from(entry.entries.entries()).map(
+            ([name, { amount, color }]) => ({
+              name,
+              amount,
+              color,
+            }),
+          ),
+        }));
+    },
+  ),
 });
