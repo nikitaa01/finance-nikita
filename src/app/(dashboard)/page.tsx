@@ -105,7 +105,10 @@ async function ExpensesByDayAndSubcategorySection() {
       <P className="mt-2!">
         The expenses by day and subcategory for the current month.
       </P>
-      <ExpensesByDayAndSubcategorySectionDynamic />
+
+      <Suspense fallback={<Skeleton className="h-96 w-full max-w-full" />}>
+        <ExpensesByDayAndSubcategorySectionDynamic />
+      </Suspense>
     </section>
   );
 }
