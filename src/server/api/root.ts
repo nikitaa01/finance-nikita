@@ -1,8 +1,5 @@
-import { userRouter } from "@/server/api/routers/user";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-import { expenseRouter } from "./routers/expense";
-import { expenseCategoryRouter } from "./routers/expense-category";
-import { expenseSubcategoryRouter } from "./routers/expense-subcategory";
+import { lazy } from "@trpc/server";
 
 /**
  * This is the primary router for your server.
@@ -10,10 +7,10 @@ import { expenseSubcategoryRouter } from "./routers/expense-subcategory";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  user: userRouter,
-  expense: expenseRouter,
-  expenseCategory: expenseCategoryRouter,
-  expenseSubcategory: expenseSubcategoryRouter,
+  user: lazy(() => import("./routers/user")),
+  expense: lazy(() => import("./routers/expense")),
+  expenseCategory: lazy(() => import("./routers/expense-category")),
+  expenseSubcategory: lazy(() => import("./routers/expense-subcategory")),
 });
 
 // export type definition of API
