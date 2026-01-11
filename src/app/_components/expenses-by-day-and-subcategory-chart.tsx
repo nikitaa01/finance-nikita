@@ -3,6 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
+import { useIsMobile } from "@/app/_hooks/use-mobile";
 import { useTRPC } from "@/trpc/react";
 
 import {
@@ -18,6 +19,12 @@ const currencyFormatter = new Intl.NumberFormat("es-ES", {
   style: "currency",
   currency: "EUR",
   maximumFractionDigits: 2,
+});
+
+const compactCurrencyFormatter = new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
 });
 
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {
@@ -42,6 +49,7 @@ const makeConfigKey = (label: string) => {
 
 export const ExpensesByDayAndSubcategoryChart = () => {
   const trpc = useTRPC();
+  const isMobile = useIsMobile();
   const { data } = useSuspenseQuery(
     trpc.expense.getMonthlyExpensesByDayAndSubcategory.queryOptions(),
   );
@@ -72,8 +80,62 @@ export const ExpensesByDayAndSubcategoryChart = () => {
       return candidate;
     };
 
-    const dataset = data.map((day) => {
-      const entry: Record<string, string | number> = { date: day.date };
+    // Primero, recopilar todas las subcategorías y sus colores
+    const allSubcategories = new Map<string, string>();
+    for (const day of data) {
+      for (const subcategory of day.entries) {
+        if (!allSubcategories.has(subcategory.name)) {
+          allSubcategories.set(subcategory.name, subcategory.color);
+        }
+      }
+    }
+
+    // Crear un mapa de datos existentes por fecha (solo día del mes)
+    const dataByDay = new Map<number, (typeof data)[0]>();
+    for (const day of data) {
+      const dayOfMonth = day.date.getDate();
+      dataByDay.set(dayOfMonth, day);
+    }
+
+    // Generar todos los días del mes actual
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const allDaysData: Array<{
+      date: Date;
+      entries: Array<{ name: string; amount: number; color: string }>;
+    }> = [];
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const existingDay = dataByDay.get(day);
+
+      if (existingDay) {
+        allDaysData.push(existingDay);
+      } else {
+        // Crear entrada vacía para este día
+        allDaysData.push({
+          date,
+          entries: Array.from(allSubcategories.entries()).map(
+            ([name, color]) => ({
+              name,
+              amount: 0,
+              color,
+            }),
+          ),
+        });
+      }
+    }
+
+    const dataset = allDaysData.map((day) => {
+      const entry: Record<string, string | number> = {
+        date: day.date.toLocaleDateString(undefined, {
+          day: "2-digit",
+          month: "short",
+        }),
+      };
 
       for (const subcategory of day.entries) {
         const key = getKeyForName(subcategory.name);
@@ -148,7 +210,11 @@ export const ExpensesByDayAndSubcategoryChart = () => {
     >
       <BarChart
         data={chartData}
-        margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+        margin={
+          isMobile
+            ? { top: 8, right: 8, left: 0, bottom: 8 }
+            : { top: 8, right: 16, left: 8, bottom: 8 }
+        }
       >
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis
@@ -156,10 +222,17 @@ export const ExpensesByDayAndSubcategoryChart = () => {
           tickLine={false}
           axisLine={false}
           tickFormatter={parseDateLabel}
+          interval={isMobile ? "equidistantPreserveStart" : 0}
+          tick={{ fontSize: isMobile ? 10 : 12 }}
         />
         <YAxis
-          tickFormatter={(value: number) => currencyFormatter.format(value)}
-          width={80}
+          tickFormatter={(value: number) =>
+            isMobile
+              ? compactCurrencyFormatter.format(value)
+              : currencyFormatter.format(value)
+          }
+          width={isMobile ? 55 : 80}
+          tick={{ fontSize: isMobile ? 10 : 12 }}
         />
         <ChartTooltip
           content={
@@ -181,7 +254,7 @@ export const ExpensesByDayAndSubcategoryChart = () => {
             }
             fill={`var(--color-${key})`}
             stackId="expenses"
-            maxBarSize={24}
+            maxBarSize={isMobile ? 16 : 24}
             radius={[4, 4, 0, 0]}
           />
         ))}

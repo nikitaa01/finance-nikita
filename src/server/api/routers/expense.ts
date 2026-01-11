@@ -71,25 +71,21 @@ export const expenseRouter = createTRPCRouter({
       const expensesGroupedByDay = new Map<
         string,
         {
-          date: string;
+          date: Date;
+          timestamp: number;
           entries: Map<string, { amount: number; color: string }>;
         }
       >();
 
       for (const expenseEntry of monthlyExpenses) {
-        // Normalize to local date (start of day) to avoid timezone issues
-        const localDate = new Date(
-          expenseEntry.date.getFullYear(),
-          expenseEntry.date.getMonth(),
-          expenseEntry.date.getDate(),
-        );
-        const year = localDate.getFullYear();
-        const month = String(localDate.getMonth() + 1).padStart(2, "0");
-        const day = String(localDate.getDate()).padStart(2, "0");
-        const dayKey = `${year}-${month}-${day}`;
+        const dayKey = `${expenseEntry.date.getDate()} ${expenseEntry.date.toLocaleString(undefined, { month: "short" })}`;
         let dayEntry = expensesGroupedByDay.get(dayKey);
         if (!dayEntry) {
-          dayEntry = { date: dayKey, entries: new Map() };
+          dayEntry = {
+            date: expenseEntry.date,
+            timestamp: expenseEntry.date.getTime(),
+            entries: new Map(),
+          };
           expensesGroupedByDay.set(dayKey, dayEntry);
         }
 
@@ -104,7 +100,7 @@ export const expenseRouter = createTRPCRouter({
       }
 
       return Array.from(expensesGroupedByDay.values())
-        .sort((a, b) => a.date.localeCompare(b.date))
+        .sort((a, b) => a.timestamp - b.timestamp)
         .map((entry) => ({
           date: entry.date,
           entries: Array.from(entry.entries.entries()).map(
